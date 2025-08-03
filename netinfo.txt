@@ -2,6 +2,11 @@
           Outil d'information réseau (netinfo)      
 ====================================================
 
+Cartes réseau détectées (interface ↔ matériel)
+--------------------------------------------
+
+enp5s0 ↔ 05:00.0 Ethernet controller [0200]: Marque & Model
+
 [32mAdresses IP des interfaces réseau[0m
 [32m---------------------------------[0m
 
