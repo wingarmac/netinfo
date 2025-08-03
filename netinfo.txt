@@ -1,0 +1,85 @@
+====================================================
+          Outil d'information réseau (netinfo)      
+====================================================
+
+[32mAdresses IP des interfaces réseau[0m
+[32m---------------------------------[0m
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enp5s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 3c:7c:3f:bc:e0:8f brd ff:ff:ff:ff:ff:ff
+    inet 192.168.129.11/23 brd 192.168.129.255 scope global dynamic noprefixroute enp5s0
+       valid_lft 5382sec preferred_lft 5382sec
+    inet6 2a02:a03f:63a1:6200:670d:56c8:2c19:4c38/64 scope global temporary dynamic 
+       valid_lft 86378sec preferred_lft 30429sec
+    inet6 2a02:a03f:63a1:6200:c5ce:6f54:c7ce:f8dd/64 scope global dynamic mngtmpaddr noprefixroute 
+       valid_lft 86378sec preferred_lft 71978sec
+    inet6 fe80::cbdf:1f80:7a6d:b69d/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+
+[35mRoutes IPv4[0m
+[35m-----------[0m
+default via 192.168.128.1 dev enp5s0 proto dhcp src 192.168.129.11 metric 100 
+192.168.128.0/23 dev enp5s0 proto kernel scope link src 192.168.129.11 metric 100 
+
+[35mRoutes IPv6[0m
+[35m-----------[0m
+2a02:a03f:63a1:6200::/64 dev enp5s0 proto ra metric 100 pref medium
+2a02:a03f:63a1:6200::/56 via fe80::5a68:7aff:fe64:f602 dev enp5s0 proto ra metric 100 pref medium
+fe80::/64 dev enp5s0 proto kernel metric 1024 pref medium
+default via fe80::5a68:7aff:fe64:f602 dev enp5s0 proto ra metric 100 pref medium
+
+[94mServeurs DNS configurés[0m
+[94m------------------------[0m
+
+août 02 16:29:42 ubuntica systemd[1]: Started systemd-resolved.service - Network Name Resolution.
+août 02 16:29:57 ubuntica systemd-resolved[1777]: enp5s0: Bus client set default route setting: yes
+août 02 16:29:57 ubuntica systemd-resolved[1777]: enp5s0: Bus client set DNS server list to: 8.8.8.8, 195.238.2.21, 2606:4700:4700::1111, 2606:4700:4700::1001
+août 02 16:30:06 ubuntica systemd-resolved[1777]: enp5s0: Bus client set DNS server list to: 8.8.8.8, 195.238.2.21
+août 02 16:30:10 ubuntica systemd-resolved[1777]: enp5s0: Bus client set search domain list to: home
+
+[31mStatut du pare-feu[0m
+[31m------------------[0m
+
+Votre système utilise nftables.
+
+Voici les règles :
+
+[31mPare-feu IPv4[0m
+[31m------------------[0m
+
+● Chaîne : INPUT
+    		type filter hook input priority filter; policy drop;
+    		iifname "lo" counter packets 198657 bytes 66955773 accept
+    		ct state related,established counter packets 34227 bytes 18794787 accept
+    		ip saddr 192.168.128.0/23 tcp dport 631 counter packets 0 bytes 0 accept
+    		ip saddr 192.168.128.0/23 tcp dport 8000-8003 counter packets 0 bytes 0 accept
+    		tcp dport 8000-8003 counter packets 0 bytes 0 drop
+● Chaîne : FORWARD
+    		type filter hook forward priority filter; policy drop;
+● Chaîne : OUTPUT
+    		type filter hook output priority filter; policy accept;
+
+[31mPare-feu IPv6[0m
+[31m------------------[0m
+
+● Chaîne : INPUT
+    		type filter hook input priority filter; policy drop;
+    		iifname "lo" counter packets 24 bytes 2777 accept
+    		ct state related,established counter packets 1162942 bytes 1464572056 accept
+    		meta l4proto ipv6-icmp counter packets 3711 bytes 442632 accept
+    		udp dport 546 counter packets 1 bytes 122 accept
+    		tcp dport 8000-8003 counter packets 0 bytes 0 drop
+● Chaîne : FORWARD
+    		type filter hook forward priority filter; policy drop;
+● Chaîne : OUTPUT
+    		type filter hook output priority filter; policy accept;
+
+====================================================
+              Fin du rapport netinfo                
+====================================================
