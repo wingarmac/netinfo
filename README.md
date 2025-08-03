@@ -38,7 +38,8 @@ Once installed, you can use the `netinfo` command directly from any directory.
     ```bash
     netinfo
     ```
-
+    [Voir un exemple de rapport détaillé](netinfo.txt)
+    
 -   **Export to Text File:**
     ```bash
     netinfo txt
