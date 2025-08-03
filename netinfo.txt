@@ -80,6 +80,17 @@ Voici les règles :
 ● Chaîne : OUTPUT
     		type filter hook output priority filter; policy accept;
 
+[33mPorts TCP ouverts et services associés[0m
+--------------------------------------
+
+[31mPort 22 (ssh)[0m
+sshd     1234 root  ... TCP *:22 (LISTEN)
+
+[31mPort 631 (ipp)[0m
+cupsd    1278 root  ... TCP localhost:631 (LISTEN)
+
+...
+
 ====================================================
               Fin du rapport netinfo                
 ====================================================
