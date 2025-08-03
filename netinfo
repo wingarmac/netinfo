@@ -1,4 +1,36 @@
 #!/bin/bash
+echo
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    cat <<EOF
+Usage: netinfo [option]
+
+Network reporting tool for Linux systems
+Displays IP configuration, routing, DNS, firewall rules, and open TCP services.
+
+Options:
+  txt           Export the report to a local text file (netinfo-YYYY-MM-DD_HHhMM.txt)
+  nc            Share the report via a public link using termbin.com (requires netcat-openbsd)
+  --no-color    Disable ANSI color codes in terminal output
+  --help        Show this help message and exit
+
+Notes:
+  - This tool uses 'ip', 'journalctl', and either 'nft' or 'iptables' depending on your firewall.
+  - Sections involving firewall and open TCP ports require root privileges.
+  - 'nmap' and 'lsof' are used to correlate open TCP ports with running services.
+
+Examples:
+  netinfo                 Run and display the report in the terminal
+  netinfo txt             Export to text file
+  netinfo nc              Share via termbin.com
+  netinfo --no-color      Useful for piping or cron jobs
+
+Version: 1.0  
+License: GNU GPL v3.0  
+Repository: https://github.com/wingarmac/netinfo
+EOF
+echo
+    exit 0
+fi
 
 generate_report() {
     echo "===================================================="
