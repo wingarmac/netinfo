@@ -38,6 +38,29 @@ generate_report() {
     echo "===================================================="
     echo ""
 
+    # Detection materiel
+    echo -e "\e[36mCartes réseau détectées (interface ↔ matériel)\e[0m"
+    echo -e "\e[36m--------------------------------------------\e[0m"
+    echo ""
+
+    for iface in $(ls /sys/class/net/ | grep -v lo); do
+        dev_path=$(readlink -f "/sys/class/net/$iface/device")
+        if [[ -e "$dev_path" ]]; then
+            pci_id=$(basename "$dev_path")              # ex: 0000:05:00.0
+            short_id=${pci_id#0000:}                    # ex: 05:00.0
+            lspci_line=$(lspci -nn | grep "^$short_id ")
+            if [[ -n "$lspci_line" ]]; then
+                echo "$iface ↔ $lspci_line"
+            else
+                echo "$iface ↔ (carte PCI non listée)"
+            fi
+        else
+            echo "$iface ↔ (non liée à un bus PCI)"
+        fi
+    done
+
+    echo ""
+
     echo -e "\e[32mAdresses IP des interfaces réseau\e[0m"
     echo -e "\e[32m---------------------------------\e[0m"
     echo ""
