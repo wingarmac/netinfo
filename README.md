@@ -38,8 +38,6 @@ Once installed, you can use the `netinfo` command directly from any directory.
     ```bash
     netinfo
     ```
-    Generates and displays the report directly in your terminal.
-    [See a detailed report example here](output.md)
 
 -   **Export to Text File:**
     ```bash
