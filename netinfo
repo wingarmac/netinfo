@@ -93,6 +93,24 @@ generate_report() {
         sudo ip6tables -L -n -v
     fi
 
+    echo -e "\e[33mPorts TCP ouverts et services associés\e[0m"
+    echo -e "\e[33m--------------------------------------\e[0m"
+    echo ""
+
+    nmap_output=$(nmap -Pn localhost 2>/dev/null)
+    tcp_ports=$(echo "$nmap_output" | awk '/^[0-9]+\/tcp/ {split($1,p,"/"); print p[1] " " $3}')
+
+    if [ -z "$tcp_ports" ]; then
+        echo "Aucun port TCP ouvert détecté par Nmap."
+    else
+        while read -r port service; do
+            echo -e "\e[31mPort $port ($service)\e[0m"
+            sudo lsof -nP -iTCP:$port -sTCP:LISTEN 2>/dev/null || echo "   Aucun processus en écoute sur ce port."
+            echo ""
+        done <<< "$tcp_ports"
+    fi
+
+
     echo "===================================================="
     echo "              Fin du rapport netinfo                "
     echo "===================================================="
