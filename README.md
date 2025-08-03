@@ -4,7 +4,8 @@
 
 ## Features
 
-- **List available network adapters with identity:** Shows `enpXsY ↔ PCI-ID Device Description` (e.g. `enp5s0 ↔ 05:00.0 Ethernet controller [0200]: Brand & Model`)
+- **List available network adapters with identity:**  
+  Shows `enpXsY ↔ PCI-ID Device Description` (e.g. `enp5s0 ↔ 05:00.0 Ethernet controller [0200]: Brand & Model`)
 - **IP Addresses:** Displays IPv4 and IPv6 addresses for all network interfaces.
 - **Routing Tables:** Presents both IPv4 and IPv6 routing tables.
 - **DNS Servers:** Extracts configured DNS servers using `systemd-resolved`.
