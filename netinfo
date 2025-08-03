@@ -1,0 +1,137 @@
+#!/bin/bash
+
+generate_report() {
+    echo "===================================================="
+    echo "          Outil d'information réseau (netinfo)      "
+    echo "===================================================="
+    echo ""
+
+    echo -e "\e[32mAdresses IP des interfaces réseau\e[0m"
+    echo -e "\e[32m---------------------------------\e[0m"
+    echo ""
+    ip a
+    echo ""
+    
+    echo -e "\e[35mRoutes IPv4\e[0m"
+    echo -e "\e[35m-----------\e[0m"
+    ip route show
+    echo ""
+
+    echo -e "\e[35mRoutes IPv6\e[0m"
+    echo -e "\e[35m-----------\e[0m"
+    ip -6 route show
+    echo ""
+
+    echo -e "\e[94mServeurs DNS configurés\e[0m"
+    echo -e "\e[94m------------------------\e[0m"
+    echo ""
+    start_line=$(journalctl -u systemd-resolved --no-pager | grep "Started systemd-resolved.service" | tail -n 1)
+
+    if [ -n "$start_line" ]; then
+        start_time=$(echo "$start_line" | awk '{print $1" "$2" "$3}')
+        journalctl -u systemd-resolved --since "$start_time" --no-pager | sed -n "/Started systemd-resolved/,/search domain list/p"
+    else
+        echo "Impossible de trouver la ligne de démarrage du service systemd-resolved."
+    fi
+
+    echo ""
+    echo -e "\e[31mStatut du pare-feu\e[0m"
+    echo -e "\e[31m------------------\e[0m"
+    echo ""
+
+    if command -v nft &> /dev/null; then
+        echo "Votre système utilise nftables."
+        echo ""
+        echo "Voici les règles :"
+        echo ""
+
+        full_ruleset=$(sudo nft list ruleset 2>/dev/null | grep -vE '^\s*#')
+
+        afficher_table() {
+            local table_label=$1
+            local table_name=$2
+
+            echo -e "\e[31mPare-feu $table_label\e[0m"
+            echo -e "\e[31m------------------\e[0m"
+            echo ""
+
+            in_table=0
+            current_chain=""
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^table[[:space:]]+$table_name[[:space:]]+filter[[:space:]]*\{ ]]; then
+                    in_table=1
+                    continue
+                fi
+
+                if [[ $in_table -eq 1 ]]; then
+                    if [[ "$line" == "}" ]]; then
+                        in_table=0
+                        continue
+                    fi
+                    if [[ "$line" =~ chain[[:space:]]+([A-Z]+)[[:space:]]*\{ ]]; then
+                        current_chain="${BASH_REMATCH[1]}"
+                        echo "● Chaîne : $current_chain"
+                        continue
+                    fi
+                    [[ "$line" == *"}"* ]] && continue
+                    [[ -n "$line" ]] && echo "    $line"
+                fi
+            done <<< "$full_ruleset"
+
+            echo ""
+        }
+
+        afficher_table "IPv4" "ip"
+        afficher_table "IPv6" "ip6"
+    else
+        echo "Votre système utilise iptables. Voici les règles :"
+        echo ""
+        echo -e "\e[31mPare-feu IPv4\e[0m"
+        sudo iptables -L -n -v
+        echo ""
+        echo -e "\e[31mPare-feu IPv6\e[0m"
+        sudo ip6tables -L -n -v
+    fi
+
+    echo "===================================================="
+    echo "              Fin du rapport netinfo                "
+    echo "===================================================="
+
+
+    if [[ -t 1 ]]; then
+        echo ""
+        echo -e "\e[93mSouhaitez-vous exporter ce rapport ?\e[0m"
+        echo -e " - Pour un fichier texte local : \e[1mnetinfo txt\e[0m"
+        echo -e " - Pour un lien partageable :     \e[1mnetinfo nc\e[0m"
+    fi
+
+}
+
+# === Mode export texte / nc ===
+if [[ "$1" == "nc" || "$1" == "txt" ]]; then
+    tmp_file="/tmp/netinfo-raw-$$.log"
+    generate_report > "$tmp_file"
+
+    # Nettoyage des couleurs ANSI
+    sed -i 's/\x1B\[[0-9;]*[JKmsu]//g' "$tmp_file"
+
+    if [[ "$1" == "nc" ]]; then
+        # Vérifie si netcat est installé
+        REQUIRED_PKG="netcat-openbsd"
+        PKG_OK=$(dpkg-query -W --showformat='${Status}\n' "$REQUIRED_PKG" 2>/dev/null | grep "install ok installed")
+        if [ -z "$PKG_OK" ]; then
+            echo "⏳ Le paquet '$REQUIRED_PKG' est requis. Installation en cours..."
+            sudo apt update && sudo apt install -y "$REQUIRED_PKG"
+            echo "✅ '$REQUIRED_PKG' installé."
+        fi
+        cat "$tmp_file" | nc termbin.com 9999 | tr -d '\0'
+    else
+        filename="netinfo-$(date '+%F_%Hh%M').txt"
+        mv "$tmp_file" "$filename"
+        echo "$PWD/$filename"
+    fi
+    exit 0
+fi
+
+# === Mode standard ===
+generate_report
