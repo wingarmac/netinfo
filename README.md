@@ -58,3 +58,6 @@ Once installed, you can use the `netinfo` command directly from any directory.
 -   `journalctl` (for DNS information)
 -   `iptables` or `nftables` (depending on your system)
 -   `netcat-openbsd`: This package is required only for the `netinfo nc` command. The script will attempt to install it automatically if you use this option.
+
+## Version info
+This tool was created on Ubuntu Server 24.04 LTS base.
