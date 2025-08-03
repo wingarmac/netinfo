@@ -60,4 +60,5 @@ Once installed, you can use the `netinfo` command directly from any directory.
 -   `netcat-openbsd`: This package is required only for the `netinfo nc` command. The script will attempt to install it automatically if you use this option.
 
 ## Version info
-This tool was created on Ubuntu Server 24.04 LTS base.
+Developed and tested on Ubuntu Server 24.04 LTS.  
+Compatible with most Debian-based systems.
